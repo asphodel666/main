@@ -1,22 +1,24 @@
-
-import hashlib
+from Crypto.Hash import MD4
 import sys
 from multiprocessing import Pool, cpu_count
 import time
 
 def compute_hash(password, encoding, hash_function):
     """Вычисляет хеш для заданного пароля."""
-    hash_func = getattr(hashlib, hash_function.lower())  # Приводим к нижнему регистру
-    return hash_func(password.encode(encoding)).hexdigest()
+    if hash_function.lower() == 'md4':
+        hash_obj = MD4.new()
+        hash_obj.update(password.encode(encoding))
+        return hash_obj.hexdigest()
+    else:
+        print(f"Ошибка: Хэш-функция {hash_function} не поддерживается.")
+        sys.exit(1)
 
 def process_chunk(chunk, hash_list, encoding, hash_function):
     """Обрабатывает часть данных, возвращает совпадения."""
     matches = []
-    #print(hash_list)
     for password in chunk:
         password = password.strip()  # Убираем лишние пробелы и символы новой строки
         hash_value = compute_hash(password, encoding, hash_function)
-        #print(hash_value)
         # Приводим хеши к нижнему регистру и убираем лишние пробелы
         if any(hash_value.strip().lower() == h.strip().lower() for h in hash_list):
             matches.append(f"{password}:{hash_value}")
@@ -36,11 +38,6 @@ def crack_passwords(wordlist_file, encoding, hash_function, hashlist_file):
     # Загрузка хешей
     with open(hashlist_file, 'r', encoding='utf-8') as f:
         hash_list = set(f.read().splitlines())
-
-    # Печать хешей для проверки
-    #print("Loaded hashes:")
-    #for h in hash_list:
-    #   print(h)
 
     # Распараллеливание по ядрам
     num_cores = cpu_count()
@@ -76,3 +73,4 @@ if __name__ == "__main__":
     hashlist_file = sys.argv[4]
 
     crack_passwords(wordlist_file, encoding, hash_function, hashlist_file)
+
