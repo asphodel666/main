@@ -1,6 +1,7 @@
 from Crypto.Hash import MD4
 import random
 import sys
+import hashlib
 
 def hash_password(password, hash_function):
     """Возвращает хэш пароля, используя заданную хэш-функцию."""
