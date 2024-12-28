@@ -8,7 +8,7 @@ def compute_hash(password, encoding, hash_function):
     """Вычисляет хеш для заданного пароля."""
     if hash_function.lower() == 'md4':
         hash_obj = MD4.new()
-        hash_obj.update(password.encode(encoding))
+        hash_obj.update(password.encode('utf-8'))
         return hash_obj.hexdigest()
     else:
         try:
