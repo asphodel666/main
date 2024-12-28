@@ -1,4 +1,5 @@
 from Crypto.Hash import MD4
+import hashlib
 import sys
 from multiprocessing import Pool, cpu_count
 import time
@@ -10,8 +11,17 @@ def compute_hash(password, encoding, hash_function):
         hash_obj.update(password.encode(encoding))
         return hash_obj.hexdigest()
     else:
-        print(f"Ошибка: Хэш-функция {hash_function} не поддерживается.")
-        sys.exit(1)
+        try:
+            hash_obj = hashlib.new(hash_function)
+        except ValueError:
+            print(f"Ошибка: Хэш-функция {hash_function} не поддерживается.")
+            sys.exit(1)
+    
+    hash_obj.update(password.encode('utf-8'))
+    return hash_obj.hexdigest()
+#    else:
+#        print(f"Ошибка: Хэш-функция {hash_function} не поддерживается.")
+#        sys.exit(1)
 
 def process_chunk(chunk, hash_list, encoding, hash_function):
     """Обрабатывает часть данных, возвращает совпадения."""
@@ -26,8 +36,20 @@ def process_chunk(chunk, hash_list, encoding, hash_function):
 
 def split_list(data, num_chunks):
     """Разделяет данные на равные части."""
-    avg = len(data) // num_chunks
-    return [data[i * avg:(i + 1) * avg] for i in range(num_chunks)]
+    chunk_size = len(data) // num_chunks
+    remainder = len(data) % num_chunks
+    chunks = []
+    start = 0
+
+    for i in range(num_chunks):
+        # Добавляем по одному элементу из остатка к первым частям
+        extra = 1 if i < remainder else 0
+        end = start + chunk_size + extra
+        chunks.append(data[start:end])
+        start = end
+
+    return chunks
+
 
 def crack_passwords(wordlist_file, encoding, hash_function, hashlist_file):
     """Основная функция для восстановления паролей."""
@@ -73,4 +95,3 @@ if __name__ == "__main__":
     hashlist_file = sys.argv[4]
 
     crack_passwords(wordlist_file, encoding, hash_function, hashlist_file)
-
