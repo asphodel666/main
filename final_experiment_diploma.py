@@ -1,30 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Diploma experiment: AdaptiveLiteFastBalanced on MNIST/Fashion-MNIST.
 
-Purpose:
-- Keep the stable v4 FastBalanced logic.
-- Add dataset switch: MNIST, Fashion-MNIST, or both.
-- Train separate LeNet5 weights per dataset if missing.
-- Run baselines once, without K loop.
-- Run K sweep only for AdaptiveLiteFastBalanced.
-- Save raw CSV and summary CSV.
-
-Default experiment:
-- total budget: 6 hours per dataset
-- runs: 3
-- seeds: 100 correctly classified test samples
-- K values: 50, 100, 1000, 10000
-
-Fast check example:
-python final_experiment_diploma.py --dataset fashionmnist --total_budget_sec 300 --num_runs 1 --k_values 50,100
-
-Full MNIST:
-python final_experiment_diploma.py --dataset mnist --total_budget_sec 21600 --num_runs 3 --k_values 50,100,1000,10000
-
-Full Fashion-MNIST:
-python final_experiment_diploma.py --dataset fashionmnist --total_budget_sec 21600 --num_runs 3 --k_values 50,100,1000,10000
-"""
 
 from __future__ import annotations
 
